@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+from multiprocessing import freeze_support
 import os
 import logging
 import time
@@ -22,6 +23,8 @@ from eval_utils import compute_scores
 
 
 logger = logging.getLogger(__name__)
+if __name__ == '__main__':
+    freeze_support()
 
 
 def init_args():
@@ -306,10 +309,13 @@ if args.do_train:
 if args.do_direct_eval:
     print("\n****** Conduct Evaluating with the last state ******")
 
-    # model = T5FineTuner(args)
+    tfm_model = T5ForConditionalGeneration.from_pretrained(args.model_name_or_path)
 
-    # print("Reload the model")
-    # model.model.from_pretrained(args.output_dir)
+    model = T5FineTuner(args, tfm_model, tokenizer)
+
+    print("Reload the model")
+    
+    model.model.from_pretrained('saved_model')
 
     sents, _ = read_line_examples_from_file(f'data/{args.dataset}/test.txt')
 
